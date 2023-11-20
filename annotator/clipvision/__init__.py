@@ -2,7 +2,7 @@ import os
 import cv2
 import torch
 
-from modules import devices
+from modules import devices, shared
 from modules.modelloader import load_file_from_url
 from annotator.annotator_path import models_path
 from transformers import CLIPVisionModelWithProjection, CLIPVisionConfig, CLIPImageProcessor
@@ -78,11 +78,13 @@ downloads = {
 }
 
 
+actual_use_device = 'cpu' if shared.cmd_opts.use_cpu else devices.get_optimal_device_name()
+
 clip_vision_h_uc = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'clip_vision_h_uc.data')
-clip_vision_h_uc = torch.load(clip_vision_h_uc,  map_location=torch.device('cuda' if torch.cuda.is_available() else 'cpu'))['uc']
+clip_vision_h_uc = torch.load(clip_vision_h_uc,  map_location=torch.device(actual_use_device))['uc']
 
 clip_vision_vith_uc = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'clip_vision_vith_uc.data')
-clip_vision_vith_uc = torch.load(clip_vision_vith_uc, map_location=torch.device('cuda' if torch.cuda.is_available() else 'cpu'))['uc']
+clip_vision_vith_uc = torch.load(clip_vision_vith_uc, map_location=torch.device(actual_use_device))['uc']
 
 
 class ClipVisionDetector:
